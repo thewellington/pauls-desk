@@ -134,7 +134,7 @@ def rest(req, url, data=None):
         print json.dumps(json_output, indent = 4)        
         return body
     else:
-        print "Oops!  Error: status: %s\n%s" % (status, body)
+        print "Status: %s\n%s" % (status, body)
         print
         
 ############################################################################ 
