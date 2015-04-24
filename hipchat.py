@@ -72,20 +72,15 @@ def _api_put(url, data):
     return response.status_code, response.text
     
 
-def _api_post(argv):
-    url, name, passwd = argv[0], argv[1], argv[2]
+def _api_post(url, data):
+    url, data = url, data
     
     requisite_headers = { 'Accept' : 'application/json',
-                          'Content-Type' : 'application/json'
+                          'Content-Type' : 'application/json',
+                          'Authorization' : auth
     }
-    auth = (name, passwd) 
  
-    if len(argv) > 3:
-        data = load_file(argv[3])
-    else:
-        data = None
-    
-    response =  requests.post(url, headers=requisite_headers, auth=auth, data=data)
+    response =  requests.post(url, headers=requisite_headers, data=data)
     
     return response.status_code, response.text
 
@@ -166,7 +161,15 @@ def list_room_participants(room_id):
 #     l.append(j.get('items'))
     
   return l
-
+def message_room(room_id):
+  data = json.dumps({
+        'message': 'this is a test',
+        'color': 'yellow',
+        'message_format': 'html',
+        'notify' : False})
+  url = base_url+'/v2/room/'+room_id+'/message'
+  rest('post', url, data)
+  
 
 
 
@@ -278,6 +281,8 @@ def ui(argv):
         list_rooms()
       elif action == 'room-participants':
         list_room_participants('564688')
+      elif action == 'message-room':
+        message_room('1452085')
       elif action != 'suspend':
         usage(2)
       
