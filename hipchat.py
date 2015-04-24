@@ -161,6 +161,7 @@ def list_room_participants(room_id):
 #     l.append(j.get('items'))
     
   return l
+
 def message_room(room_id):
   data = json.dumps({
         'message': 'this is a test',
@@ -170,7 +171,6 @@ def message_room(room_id):
   url = base_url+'/v2/room/'+room_id+'/message'
   rest('post', url, data)
   
-
 
 
 
