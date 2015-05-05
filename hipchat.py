@@ -124,7 +124,7 @@ def rest(req, url, data=None):
 
 
 ############################################################################ 
-#### begin custom functions
+#### messaging and interaction functions
 
 def list_rooms():
   url = base_url+'/v2/room'
@@ -146,35 +146,19 @@ def list_room_participants(room_id):
   return l
 
 
-def message_room(room_id):
+def notify_room(room_id):
   data = json.dumps({
         'message': 'this is a test',
         'color': 'yellow',
-        'message_format': 'html',
-        'notify' : False})
-  url = base_url+'/v2/room/'+room_id+'/message'
+        'message_format': 'text',
+        'notify' : True})
+  url = base_url+'/v2/room/'+room_id+'/notification'
   rest('post', url, data)
 
 
-# def get_exclusions():
-#   exclusions = []
-#   f = open(control_dir+'/exclusions-final.conf', 'r')
-#   for line in f:
-#    exclusions.append(line.split("#",1)[0].rstrip())
-#   exclusions = filter(None, exclusions)  
-#   #encode exclusions in unicode
-#   unicode_exclusions = [unicode(i) for i in exclusions]
-#   return unicode_exclusions
+############################################################################ 
+#### begin custom functions
 
-
-# def suspend_configurations():
-#   configurations = set(get_configurations())
-#   exclusions = set(get_exclusions())
-#   suspends = list(configurations - exclusions)
-#   data = {'runstate' : 'suspended'}
-#   for i in suspends:
-#     print i
-#     rest('put', base_url+'/configurations/2156312?runstate=suspended', user, token, data=data)
 
 
 ############################################################################ 
@@ -245,8 +229,8 @@ def ui(argv):
         list_rooms()
       elif action == 'room-participants':
         list_room_participants('564688')
-      elif action == 'message-room':
-        message_room('1452085')
+      elif action == 'notify-room':
+        notify_room('1452085')
       elif action != 'suspend':
         usage(2)
     elif opt in ( '-s', '--scope' ):
