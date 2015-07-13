@@ -145,6 +145,13 @@ def list_room_participants(room_id):
 #     l.append(j.get('items'))
   return l
 
+def get_room_history(room_id):
+  url = base_url+'/v2/room/'+room_id+'/history/latest'
+  body = rest('get', url, data=None)
+  json_output = json.loads(body)
+  l = []
+  return l
+
 
 def notify_room(room_id):
   data = json.dumps({
@@ -227,6 +234,8 @@ def ui(argv):
       action = arg
       if action == 'list-rooms':
         list_rooms()
+      elif action == 'room-history':
+        get_room_history('564688')
       elif action == 'room-participants':
         list_room_participants('564688')
       elif action == 'notify-room':

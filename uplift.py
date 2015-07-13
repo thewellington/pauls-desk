@@ -13,29 +13,12 @@ class UpliftDesk:
         GPIO.setup(self.pindown, GPIO.OUT) 
         GPIO.output(self.pinup,True)
         GPIO.output(self.pindown,True)
-    def up(self):
+    def up(self, steps = 1):
         GPIO.output(self.pinup, False)
-        time.sleep(self.delay)
+        time.sleep(self.delay * steps)
         GPIO.output(self.pinup,True)
-    def down(self):
+    def down(self, steps = 1):
         GPIO.output(self.pindown, False)
-        time.sleep(self.delay)
+        time.sleep(self.delay * steps)
         GPIO.output(self.pindown,True)
 
-uplift = UpliftDesk(18,22)
-
-##Define a function named Blink()
-def Blink(numTimes,speed):
-    for i in range(0,numTimes):## Run loop numTimes
-        print "Iteration " + str(i+1)## Print current loop
-        uplift.up()
-        time.sleep(speed)## Wait
-        uplift.down()
-        time.sleep(speed)## Wait
-    print "Done" ## When loop is complete, print "Done"
-
-
-## Start Blink() function. Convert user input from strings to numeric data types and pass to Blink() as parameters
-Blink(10,10)
-
-GPIO.cleanup()
