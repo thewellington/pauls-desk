@@ -1,14 +1,47 @@
-#import uplift
 import hipchat
 import time
 import thread
+import yaml
+import sys
+
+try:
+    import uplift
+except ImportError:
+    sys.stderr.write("Uplift failed to import. Desk functions disabled.")
+
+class BadDesk:
+    def up(self):
+        sys.stderr.write("Attempting to move desk up, but module not"
+                " imported.")
+    def down(self):
+        sys.stderr.write("Attempting to move desk down, but module not"
+                " imported.")
 
 def input_thread(L):
     raw_input()
     L.append(None)
-            
-#desk = uplift.UpliftDesk(18,22)
 
+if 'uplift' in sys.modules:
+    desk = uplift.UpliftDesk(18,22)
+else:
+    desk = BadDesk()
+
+try:
+    f = open('responses.yml')
+    response_data = yaml.safe_load(f)
+    f.close()
+except:
+    sys.stderr.write("Error loading response.yml file.")
+    response_data = []
+    
+def y(needle):
+    global response_data
+    try:
+        response = response_data[needle]
+        
+    except:
+        sys.stderr.write("YAML error reading response for " + str(needle))
+        return ""
 
 '''
 def Blink(numTimes,speed):
@@ -24,6 +57,9 @@ def Blink(numTimes,speed):
 def msg_hello(message, control, friend):
     return "Hi!"
 
+def msg_default(needle, message, control, friend):
+    return y(needle)
+    
 def msg_status(message, control, friend):
     if not control:
         return ""
