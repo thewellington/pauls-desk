@@ -96,8 +96,7 @@ class HipchatRoom:
     def process_one_message(self, message):
         for needle in self.response_list:
             if needle.lower() in message.msg.lower():
-                response = self.response_list[needle](message,
-                            self.control_room, is_friend(message.fromid))
+                response = self.response_list[needle](needle, message)
                 return response
         return ""
 
@@ -111,9 +110,20 @@ class HipchatMessage:
                             "%Y-%m-%dT%H:%M:%S.%f+00:00")
         self.msg = msg
         self.id = ''
-
+        self.room = 0
+        
     def __str__(self):
         return self.msg
+        
+    def is_control(self):
+        if self.room == control_room:
+            return True
+        return False
+        
+    def is_friend(self):
+        if fromid in friends:
+            return True
+        return False
 
 
 class HipchatUser:
@@ -279,6 +289,7 @@ def get_latest_message(room_id):
     l = []
     for j in json_output["items"]:
         hm = parse_hipchat_message(j)
+        hm.room = room_id
         l.append(hm)
     return l
 
@@ -290,6 +301,7 @@ def get_room_history(room_id):
     l = []
     for j in json_output["items"]:
         hm = parse_hipchat_message(j)
+        hm.room = room_id
         l.append(hm)
     return l
 

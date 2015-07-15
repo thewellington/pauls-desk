@@ -3,6 +3,7 @@ import time
 import thread
 import yaml
 import sys
+import random
 
 try:
     import uplift
@@ -28,19 +29,28 @@ else:
 
 try:
     f = open('responses.yml')
-    response_data = yaml.safe_load(f)
+    response_data = yaml.load(f)
     f.close()
 except:
     sys.stderr.write("Error loading response.yml file.")
     response_data = []
+    raise
     
 def y(needle):
     global response_data
     try:
+        print response_data
         response = response_data[needle]
-        
+        if type(response) is str:
+            return response
+        if type(response) is type([]):
+            print "list"
+            return random.choice(response)
+        print "Unknown type of response object: " + str(type(response))
+        return ""
     except:
-        sys.stderr.write("YAML error reading response for " + str(needle))
+        print "YAML error reading response for " + str(needle)
+        raise
         return ""
 
 '''
@@ -54,26 +64,28 @@ def Blink(numTimes,speed):
 #    print "Done"
 '''
 
-def msg_hello(message, control, friend):
+def msg_hello(needle, message):
     return "Hi!"
 
-def msg_default(needle, message, control, friend):
+def msg_default(needle, message):
     return y(needle)
     
-def msg_status(message, control, friend):
-    if not control:
+def msg_status(needle, message):
+    if not message.is_control:
         return ""
     return "This static text says that all systems are good."
     
-def msg_ip(message, control, friend):
-    if not control:
+def msg_ip(needle, message):
+    if not message.is_control:
         return ""
     return "Here's my IP address: <calculate something, dummy>"
 
 responses = {"hello": msg_hello,
             "hi": msg_hello,
+            "hola": msg_default,
             "ip info": msg_ip,
-            "status": msg_status}
+            "status": msg_status,
+            "default": msg_default}
 
 
 list = ""
@@ -98,8 +110,6 @@ def msg_maker(msg):
 control = hipchat.HipchatRoom(hipchat.control_room)
 
 control.set_response_list(responses)
-
-control.publish_status()
 
 control.watch_room()
 
