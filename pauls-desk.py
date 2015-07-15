@@ -8,14 +8,14 @@ import random
 try:
     import uplift
 except ImportError:
-    sys.stderr.write("Uplift failed to import. Desk functions disabled.")
+    print "Uplift failed to import. Desk functions disabled."
 
 class BadDesk:
     def up(self):
-        sys.stderr.write("Attempting to move desk up, but module not"
+        print ("Attempting to move desk up, but module not"
                 " imported.")
     def down(self):
-        sys.stderr.write("Attempting to move desk down, but module not"
+        print ("Attempting to move desk down, but module not"
                 " imported.")
 
 def input_thread(L):
@@ -27,14 +27,16 @@ if 'uplift' in sys.modules:
 else:
     desk = BadDesk()
 
-try:
-    f = open('responses.yml')
-    response_data = yaml.load(f)
-    f.close()
-except:
-    sys.stderr.write("Error loading response.yml file.")
-    response_data = []
-    raise
+def update_response_yaml():
+    try:
+        f = open('responses.yml')
+        response_data = yaml.load(f)
+        f.close()
+        return response_data
+    except:
+        print "*** Error loading response.yml file."
+        return []
+        
     
 def y(needle):
     global response_data
@@ -62,9 +64,6 @@ def Blink(numTimes,speed):
 #    print "Done"
 '''
 
-def msg_hello(needle, message):
-    return "Hi!"
-
 def msg_default(needle, message):
     return y(needle)
     
@@ -78,23 +77,37 @@ def msg_ip(needle, message):
         return ""
     return "Here's my IP address: <calculate something, dummy>"
 
-responses = {"hello": msg_default,
-            "hi": msg_default,
-            "hola": msg_default,
-            "ip info": msg_ip,
+def msg_refresh(needle, message):
+    if not message.is_control:
+        return ""
+    global response_data
+    response_data = update_response_yaml()
+    for rd in response_data:
+        if rd not in responses:
+            responses[rd] = msg_default
+    
+    hipchat.friends = hipchat.get_friends()
+    return y("refresh")
+    
+def msg_friends(needle, message):
+    if not message.is_control:
+        return ""
+    hipchat.friends = hipchat.get_friends()
+    list = ""
+    for u in hipchat.friends:
+        if (len(list)>0):
+            list += ", "
+        list += u.name
+
+    list = y("friends") + list
+
+    return list
+
+
+responses = {"ip info": msg_ip,
             "status": msg_status,
-            "default": msg_default}
-
-
-list = ""
-for u in hipchat.friends:
-    if (len(list)>0):
-        list += ", "
-    list += u.name
-
-list = "Hello, my friends: " + list
-
-print list
+            "refresh": msg_refresh,
+            "friends": msg_friends}
 
 print "My user name is: " + hipchat.api_user
     
@@ -102,8 +115,12 @@ print "My user name is: " + hipchat.api_user
 
 #GPIO.cleanup()
 
-def msg_maker(msg):
-    return "Responding to: " + str(msg)
+
+response_data = update_response_yaml()
+
+for rd in response_data:
+    if rd not in responses:
+        responses[rd] = msg_default
 
 control = hipchat.HipchatRoom(hipchat.control_room)
 

@@ -1,6 +1,21 @@
 # These are the base string responses for the Fulcrum Chatbot
 
-default:            Default McDefaulterpants
+default:            ["Default McDefaulterpants","Default? Deplane! De Plane!"]
 hola:               &hi [Hello, ¡Hola!, Hi!]
 hi:                 *hi
 hello:              *hi
+up:                 ["Sure thing, boss", "Raising Paul's desk now.", "Man, what does he have on his desk anyway? It's so heavy."]
+down:               ["Wow, that was easy!", "Gravity assist", "Sure thing, boss."]
+lunch:              ["Sloop!", "I bet Paul's going to West Seattle again."]
+paul:               ["(paul)", "I know, right?", "Have you seen his double backflip?", "He used to be a cheerleader. I bet no one's told you that before.", "Quick! Hide me before he goes to HR!"]
+seahawks:           &sports ["How long will it be before Bill says 'sportsball'?", "Bring back the Sonics!"]
+mariners:           *sports
+cats:               ["Meow.", "Thundercats, Ho!"]
+elise:              "(unicorn)"
+xo:                 "(xo)"
+verizon:            &vzw "(verizon)"
+vzw:                *vzw
+
+# Some system/control level responses:
+refresh:            Responses refreshed. Friends refreshed.
+friends:            "My friends are: "
