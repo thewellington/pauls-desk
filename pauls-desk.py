@@ -39,7 +39,6 @@ except:
 def y(needle):
     global response_data
     try:
-        print response_data
         response = response_data[needle]
         if type(response) is str:
             return response
@@ -50,7 +49,6 @@ def y(needle):
         return ""
     except:
         print "YAML error reading response for " + str(needle)
-        raise
         return ""
 
 '''
@@ -80,8 +78,8 @@ def msg_ip(needle, message):
         return ""
     return "Here's my IP address: <calculate something, dummy>"
 
-responses = {"hello": msg_hello,
-            "hi": msg_hello,
+responses = {"hello": msg_default,
+            "hi": msg_default,
             "hola": msg_default,
             "ip info": msg_ip,
             "status": msg_status,

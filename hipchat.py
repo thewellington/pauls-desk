@@ -9,6 +9,7 @@ import datetime
 import dateutil
 import threading
 import time
+import re
 
 try:
     import requests
@@ -75,6 +76,7 @@ class HipchatRoom:
             self.lastmsg = messages[0].date
             return
         messages = get_room_history(self.roomid)
+        response = ""
         for one_message in messages:
             if one_message.fromid == api_user_id:
                 continue
@@ -90,12 +92,15 @@ class HipchatRoom:
                     print "\tResult: ignored"
                 else:
                     print "\tResult: " + result
-                    notify_room(self.roomid, result)
+                    response = result
+        if response != "":
+            notify_room(self.roomid, response)
         self.lastmsg = new_date
 
     def process_one_message(self, message):
+        word_list = re.split('\W+',message.msg.lower())
         for needle in self.response_list:
-            if needle.lower() in message.msg.lower():
+            if needle.lower() in word_list:
                 response = self.response_list[needle](needle, message)
                 return response
         return ""

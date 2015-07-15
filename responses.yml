@@ -1,4 +1,6 @@
 # These are the base string responses for the Fulcrum Chatbot
 
-default:           Default McDefaulterpants
-hola:              [Hello, ¡Hola!, Hi!]
+default:            Default McDefaulterpants
+hola:               &hi [Hello, ¡Hola!, Hi!]
+hi:                 *hi
+hello:              *hi
