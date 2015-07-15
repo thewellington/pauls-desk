@@ -46,6 +46,7 @@ class HipchatRoom:
         self.response_list = responses
 
     def watch_room(self):
+        self.check_messages()
         self.active = True
         self.thread = threading.Thread(target=self.room_watcher)
         self.thread.daemon = True
@@ -59,16 +60,12 @@ class HipchatRoom:
 
     def room_watcher(self):
         while self.active:
-            time.sleep(self.check_interval)
             print "Checking messages in room: " + str(self.roomid)
             self.check_messages()
+            time.sleep(self.check_interval)
 
     def update(self):
         self.participants = list_room_participants(self.roomid)
-
-    def publish_status(self):
-        status = "Status of <botname>:\nIP: <IP address>\nSystems: <normal>"
-        notify_room(self.roomid, status)
 
     def check_messages(self):
         if self.lastmsg == None:

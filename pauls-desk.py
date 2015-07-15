@@ -4,6 +4,7 @@ import thread
 import yaml
 import sys
 import random
+import socket
 
 try:
     import uplift
@@ -66,16 +67,20 @@ def Blink(numTimes,speed):
 
 def msg_default(needle, message):
     return y(needle)
-    
+
 def msg_status(needle, message):
     if not message.is_control:
         return ""
     return "This static text says that all systems are good."
     
-def msg_ip(needle, message):
+def msg_network(needle, message):
     if not message.is_control:
         return ""
-    return "Here's my IP address: <calculate something, dummy>"
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(("gmail.com",80))
+    ip = s.getsockname()[0]
+    s.close()
+    return "IP Address: " + str(ip)
 
 def msg_refresh(needle, message):
     if not message.is_control:
@@ -104,7 +109,7 @@ def msg_friends(needle, message):
     return list
 
 
-responses = {"ip info": msg_ip,
+responses = {"network": msg_network,
             "status": msg_status,
             "refresh": msg_refresh,
             "friends": msg_friends}
