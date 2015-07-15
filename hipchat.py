@@ -11,19 +11,24 @@ import threading
 import time
 
 try:
-  import requests
+    import requests
 except ImportError:
-  sys.stderr.write("You do not have the 'requests' module installed.  Please see http://docs.python-requests.org/en/latest/ for more information.")
-  exit(1)
+    sys.stderr.write("You do not have the 'requests' module installed. "
+        "Please see http://docs.python-requests.org/en/latest/ for more "
+        "information.")
+    exit(1)
 
 try:
-  import yaml
+    import yaml
 except ImportError:
-  sys.stderr.write("You do not have the 'yaml' module installed.  Please see http://pyyaml.org/wiki/PyYAMLDocumentation for more information.")
-  exit(1)
+    sys.stderr.write("You do not have the 'yaml' module installed. "
+        "Please see http://pyyaml.org/wiki/PyYAMLDocumentation for more "
+        "information.")
+    exit(1)
 
 
 class HipchatRoom:
+
     def __init__(self, roomid):
         self.roomid = roomid
         self.update()
@@ -35,39 +40,34 @@ class HipchatRoom:
         if self.roomid == control_room:
             self.control_room = True
         self.response_list = {}
-        self.callback_list = {}
-        
-    def set_response_list(self,responses):
+
+    def set_response_list(self, responses):
         self.response_list = responses
-    
-    def set_callbacks(callbacks):
-        self.callback_list = callbacks
-        
+
     def watch_room(self):
         self.active = True
         self.thread = threading.Thread(target=self.room_watcher)
         self.thread.daemon = True
         self.thread.start()
-        notify_room(control_room,"Begun watch of room:" + str(self.roomid))
-        
+        notify_room(control_room, "Begun watch of room:" + str(self.roomid))
+
     def stop_watching(self):
         self.active = False
-        notify_room(control_room,"Stopping watch of room:" + str(self.roomid))
+        notify_room(control_room, "Stopping watch of room:" + str(self.roomid))
         self.thread.join()
-        
+
     def room_watcher(self):
         while self.active:
             time.sleep(self.check_interval)
             print "Checking messages in room: " + str(self.roomid)
             self.check_messages()
-            
+
     def update(self):
         self.participants = list_room_participants(self.roomid)
 
     def publish_status(self):
         status = "Status of <botname>:\nIP: <IP address>\nSystems: <normal>"
-        notify_room(self.roomid,status)
-
+        notify_room(self.roomid, status)
 
     def check_messages(self):
         if self.lastmsg == None:
@@ -90,81 +90,77 @@ class HipchatRoom:
                     print "\tResult: ignored"
                 else:
                     print "\tResult: " + result
-                    notify_room(self.roomid,result)
+                    notify_room(self.roomid, result)
         self.lastmsg = new_date
 
     def process_one_message(self, message):
         for needle in self.response_list:
             if needle.lower() in message.msg.lower():
-                response = self.response_list[needle](message, self.control_room)
+                response = self.response_list[needle](message,
+                            self.control_room, is_friend(message.fromid))
                 return response
         return ""
-        
 
 
 class HipchatMessage:
+
     def __init__(self, fromid, date, msg):
         self.fromid = fromid
         # sample date to parse: 2015-04-24T22:10:44.146716+00:00
-        self.date = datetime.datetime.strptime(date, "%Y-%m-%dT%H:%M:%S.%f+00:00")
+        self.date = datetime.datetime.strptime(date,
+                            "%Y-%m-%dT%H:%M:%S.%f+00:00")
         self.msg = msg
         self.id = ''
-        
+
     def __str__(self):
         return self.msg
 
+
 class HipchatUser:
-    def __init__(self,id,name,mentionname):
+
+    def __init__(self, id, name, mentionname):
         self.id = id
         self.name = name
         self.mentionname = mentionname
+
     def __str__(self):
-        return "User: Name: ("+self.name+") MentionName: ("+self.mentionname+") id: ("+str(self.id)+")"
-
-# get configuration from yaml and populate variables
-
-
-############################################################################ 
-#### begin api interactions
+        return self.name
 
 
 def _api_get(url, data=None):
-    url, data = url, data    
-    requisite_headers = { 'Accept' : 'application/json',
-                          'Content-Type' : 'application/json',
-                          'Authorization' : auth
-                      }
-    response =  requests.get(url, headers=requisite_headers)
+    url, data = url, data
+    requisite_headers = {'Accept': 'application/json',
+                          'Content-Type': 'application/json',
+                          'Authorization': auth}
+    response = requests.get(url, headers=requisite_headers)
     return response.status_code, response.text
 
 
 def _api_put(url, data):
     url, name, passwd = url, user, token
-    requisite_headers = { 'Accept' : 'application/json',
-                          'Content-Type' : 'application/json'
-                      }
+    requisite_headers = {'Accept': 'application/json',
+                          'Content-Type': 'application/json'}
     auth = (name, passwd)
-    response =  requests.put(url, headers=requisite_headers, auth=auth, params=data)
+    response = requests.put(url, headers=requisite_headers,
+                                auth=auth, params=data)
     return response.status_code, response.text
 
 
 def _api_post(url, data):
     url, data = url, data
-    requisite_headers = { 'Accept' : 'application/json',
-                          'Content-Type' : 'application/json',
-                          'Authorization' : auth
-                      } 
-    response =  requests.post(url, headers=requisite_headers, data=data)
+    requisite_headers = {'Accept': 'application/json',
+                          'Content-Type': 'application/json',
+                          'Authorization': auth}
+    response = requests.post(url, headers=requisite_headers, data=data)
     return response.status_code, response.text
 
 
 def _api_del(argv):
     url, name, passwd = argv[0], argv[1], argv[2]
-    requisite_headers = { 'Accept' : 'application/json',
-                          'Content-Type' : 'application/json'
-                      }
+    requisite_headers = {'Accept': 'application/json',
+                          'Content-Type': 'application/json'}
     auth = (name, passwd)
-    response =  requests.delete(url, headers=requisite_headers, auth=auth)
+    response = requests.delete(url, headers=requisite_headers, auth=auth)
     return response.status_code, response.text
 
 #    def load_file(fname):
@@ -176,12 +172,13 @@ def rest(req, url, data=None):
     url = base_url + url
 #        print url
     if 'HTTPS' not in url.upper():
-        print "Secure connection required: HTTP not valid, please use HTTPS or https"
+        print ("Secure connection required: HTTP not valid, "
+                    "please use HTTPS or https")
         rest_usage()
     cmd = req.upper()
     if cmd not in cmds.keys():
         rest_usage()
-    status,body=cmds[cmd](url, data)
+    status, body = cmds[cmd](url, data)
     if int(status) == 200:
         json_output = json.loads(body)
 #            print json.dumps(json_output, indent = 4)
@@ -191,15 +188,16 @@ def rest(req, url, data=None):
         print
 
 
-############################################################################ 
+############################################################################
 #### messaging and interaction functions
+
 
 def parse_hipchat_message(message):
     msg = message['message']
     msg_type = message['type']
     date = message['date']
     msg_id = message['id']
-    
+
     if msg_type == 'message':
         msg_from = message['from']['id']
     elif msg_type == 'notification':
@@ -208,33 +206,51 @@ def parse_hipchat_message(message):
             msg_from = ''
     else:
         msg_from = ''
-    
+
     hm = HipchatMessage(msg_from, date, msg)
     hm.id = msg_id
     return hm
-    
+
 
 def find_user_by_name(name):
+    """Given a name, look up the appropriate user
+    """
     global users
     for u in users:
         if users[u].name == name:
             return users[u]
     return None
 
+
+def is_friend(id):
+    """Given a user id, check to see if we're in the friend list
+    """
+    global friends
+    for f in friends:
+        if f.id == id:
+            return True
+    return False
+
+
 def get_users():
+    """ Get a list of all Hipchat users"""
     url = '/v2/user'
     body = rest('get', url, data=None)
     json_output = json.loads(body)
     users = {}
     for j in json_output["items"]:
-        users[j['id']] = HipchatUser(j['id'],j['name'],j['mention_name'])
+        users[j['id']] = HipchatUser(j['id'], j['name'], j['mention_name'])
     return users
 
-# define our 'friends' (admins) as members of this room, usually the command and control room.
-def update_friends(room_id):
-    friends = list_room_participants(room_id)
-    friends = friends
+
+def get_friends():
+    """ Get a list of 'friends', meaning the participants
+    of the command and control room. These people are
+    functionally admins.
+    """
+    friends = list_room_participants(control_room)
     return friends
+
 
 def list_rooms():
     url = '/v2/room'
@@ -247,27 +263,28 @@ def list_rooms():
 
 
 def list_room_participants(room_id):
-    url = '/v2/room/'+str(room_id)+'/participant'
+    url = '/v2/room/' + str(room_id) + '/participant'
     body = rest('get', url, data=None)
     json_output = json.loads(body)
     l = []
     for j in json_output["items"]:
-         l.append(users[j['id']])
+        l.append(users[j['id']])
     return l
 
 
 def get_latest_message(room_id):
-    url = '/v2/room/'+str(room_id)+'/history/latest?max-results=1'
+    url = '/v2/room/' + str(room_id) + '/history/latest?max-results=1'
     body = rest('get', url, data=None)
     json_output = json.loads(body)
     l = []
     for j in json_output["items"]:
         hm = parse_hipchat_message(j)
         l.append(hm)
-    return l    
+    return l
+
 
 def get_room_history(room_id):
-    url = '/v2/room/'+str(room_id)+'/history/latest'
+    url = '/v2/room/' + str(room_id) + '/history/latest'
     body = rest('get', url, data=None)
     json_output = json.loads(body)
     l = []
@@ -282,12 +299,12 @@ def notify_room(room_id, message):
         'message': message,
         'color': color,
         'message_format': 'text',
-        'notify' : True})
-    url = '/v2/room/'+str(room_id)+'/notification'
+        'notify': True})
+    url = '/v2/room/' + str(room_id) + '/notification'
     rest('post', url, data)
 
 
-f = open ('config.yml')
+f = open('config.yml')
 config_data = yaml.safe_load(f)
 f.close()
 
@@ -301,15 +318,13 @@ color = config_data["notification_color"]
 api_user = config_data["user"]
 
 cmds = {
-    "GET": _api_get, 
-    "PUT": _api_put, 
+    "GET": _api_get,
+    "PUT": _api_put,
     "POST": _api_post,
-    "DELETE": _api_del
-    }
-    
+    "DELETE": _api_del}
+
 users = get_users()
 
 api_user_id = find_user_by_name(api_user)
 
-friends = update_friends(control_room)
-
+friends = get_friends()

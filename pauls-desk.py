@@ -21,15 +21,15 @@ def Blink(numTimes,speed):
 #    print "Done"
 '''
 
-def msg_hello(message, control):
+def msg_hello(message, control, friend):
     return "Hi!"
 
-def msg_status(message, control):
+def msg_status(message, control, friend):
     if not control:
         return ""
     return "This static text says that all systems are good."
     
-def msg_ip(message, control):
+def msg_ip(message, control, friend):
     if not control:
         return ""
     return "Here's my IP address: <calculate something, dummy>"
