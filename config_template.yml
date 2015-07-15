@@ -1,9 +1,12 @@
 # this is a configuration template for pauls-desk.  Copy this file to ./config.yml and populate with variables for your environment
 #
 
-base_url:       https://api.hipchat.com                                # base url for rest queries
-token:          <api_token>                                             # API Token
+base_url:           https://api.hipchat.com                                 # base url for rest queries
+token:              <api_token>                                             # API Token
+user:               <usernamne>                                             # Full user name of the user beloging to the API token
+working_dir:        <path to pauls-desk>                                    # this is the path to the skynet.py file
+temp_dir:           <path to temp directory>                                # path to a temporary directory
 
-working_dir:    <path to pauls-desk>                                     # this is the path to the skynet.py file
-temp_dir:       <path to temp directory>                                # path to a temporary directory
+control_room:       <room id>                                               # command and control room id in hipchat
 
+notification_color: yellow                                                  # default color for notifications
