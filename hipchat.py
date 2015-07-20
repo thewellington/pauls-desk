@@ -122,7 +122,7 @@ class HipchatRoom:
                     except:
                         print "\tResult: non-ascii characters in reply."
         if response != "":
-            notify_room(control_room, "(Room: " + self.name + ") " + str(response))
+            notify_room(control_room, "(Room: " + self.name + ") " + response_list)
 #            notify_room(self.roomid, response)
         self.lastmsg = new_date
 
