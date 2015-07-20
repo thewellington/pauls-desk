@@ -13,6 +13,7 @@ import re
 
 try:
     import requests
+    requests.packages.urllib3.disable_warnings()
 except ImportError:
     sys.stderr.write("You do not have the 'requests' module installed. "
         "Please see http://docs.python-requests.org/en/latest/ for more "
