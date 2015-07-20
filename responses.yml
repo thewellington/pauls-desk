@@ -1,7 +1,7 @@
 # These are the base string responses for the Fulcrum Chatbot
 
 default:            ["Default McDefaulterpants","Default? Deplane! De Plane!", "Default? Your Fault!"]
-hola:               &hi [Hello, ¡Hola!, Hi!, Wassup?]
+hola:               &hi [Hello, ¡Hola!, Hi!, "Wassup?"]
 hi:                 *hi
 hello:              *hi
 up:                 ["Sure thing, boss", "Raising Paul's desk now.", "Man, what does he have on his desk anyway? It's so heavy."]
@@ -14,7 +14,7 @@ cats:               ["Meow.", "Thundercats, Ho!"]
 help:               ["You think you need help? You should try living in an unused chatroom.", "Help is only a phone call away.", "If there's somethin' strange, in your neighborhood. Who you gonna call?"]
 try:                ["No! Try not. Do, or do not. There is no try."]
 old:                ["When 900 years old you reach, look as good you will not."]
-nextgen:            ["Generation X? should I get a McJob"]
+nextgen:            ["Generation X? Should I get a McJob?"]
 ghostbusters:       ["when the light is green, the trap is clean.", "Do not cross the beams!", "We came. We saw. We kicked its ass!", "I am terrified beyond the capacity for rational thought.", "Listen! Do you smell something?"]
 dude:               ["The Dude abides"]
 
@@ -24,7 +24,7 @@ dude:               ["The Dude abides"]
 
 elise:              "(unicorn)"
 paul:               ["(paul)", "I know, right?", "Have you seen his double backflip?", "He used to be a cheerleader. I bet no one's told you that before.", "Quick! Hide me before he goes to HR!", "(paulbacon)"]
-liz:                 ["Liz, Fliz!", "Did you hear that she is opening up a blog? 'On the Road with Liz!'"]
+liz:                ["Liz, Fliz!", "Did you hear that she is opening up a blog? 'On the Road with Liz!'"]
 
 
 
