@@ -11,7 +11,7 @@ seahawks:           &sports ["How long will it be before Bill says 'sportsball'?
 mariners:           *sports
 sounders:           *sports
 cats:               ["Meow.", "Thundercats, Ho!"]
-help:               ["You think you need help? You should try living in an unused chatroom.", "Help is only a phone call away.", "Who you gonna call?"]
+help:               ["You think you need help? You should try living in an unused chatroom.", "Help is only a phone call away.", "If there's somethin' strange, in your neighborhood. Who you gonna call?"]
 try:                ["No! Try not. Do, or do not. There is no try."]
 old:                ["When 900 years old you reach, look as good you will not."]
 nextgen:            ["Generation X? should I get a McJob"]
