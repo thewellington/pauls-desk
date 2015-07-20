@@ -66,7 +66,7 @@ def Blink(numTimes,speed):
 #    print "Done"
 '''
 
-def get_ip_address()
+def get_ip_address():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect(("gmail.com",80))
     ip = s.getsockname()[0]
@@ -156,8 +156,10 @@ def evaluate_existing_room(room):
     la = room.last_active()
     if la == datetime.date.min:
         hipchat.notify_control("Considering archive of room: " + str(room) + ". Last accessed: Never.")
+        return
     elif (datetime.datetime.utcnow() - la) > datetime.timedelta(180):
         hipchat.notify_control("Considering archive of room: " + str(room) + ". Last accessed: " + str(la) + ".")
+        return
         
     if (datetime.datetime.utcnow() - la) < datetime.timedelta(hours=1):
         room.watch_room()
@@ -191,11 +193,7 @@ def evaluate_rooms():
         for r in room_objects:
             r.check_interval = max(default_interval, interval)
 
-for x in hipchat.rooms:
-    room = hipchat.HipchatRoom(x)
-    room.set_response_list(responses)
-    room.lastevaluated = datetime.datetime.utcnow()
-    room_objects.append(room)
+
     
 print "My user name is: " + hipchat.api_user
     
@@ -217,7 +215,12 @@ control.watch_room()
 
 room_objects = []
 
-
+for x in hipchat.rooms:
+    room = hipchat.HipchatRoom(x)
+    room.set_response_list(responses)
+    room.lastevaluated = datetime.datetime.utcnow()
+    room_objects.append(room)
+    
 alive = True
 waitqueue = []
 thread.start_new_thread(input_thread, (waitqueue,))
