@@ -247,4 +247,4 @@ evaluate_thread.join()
 hipchat.notify_control("Goodnight.")
 print "Threads finished. Ending Program."
 
-#GPIO.cleanup()
+GPIO.cleanup()
