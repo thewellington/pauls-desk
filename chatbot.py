@@ -33,16 +33,20 @@ else:
 def update_response_yaml():
     try:
         f = open('responses.yml')
-        response_data = yaml.load(f)
+        yaml_response_data = yaml.load(f)
         f.close()
-        return response_data
-    except:
+        return yaml_response_data
+    except yaml.YAMLError:
         print "*** Error loading response.yml file."
         return []
-        
-    
+
+
 def y(needle):
-    global response_data
+    """Given a string (needle), pick a response from the yaml response list.
+
+    If there are multiple responses, choose one at random. If none exist,
+    just return an empty string.
+    """
     try:
         response = response_data[needle]
         if type(response) is str:
@@ -67,48 +71,58 @@ def Blink(numTimes,speed):
 '''
 
 def get_ip_address():
+    """Return our ip address."""
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect(("gmail.com",80))
     ip = s.getsockname()[0]
     s.close()
     return ip
-    
-def msg_default(needle, message):
+
+def msg_default(needle, _):
+    """The default message checker.
+
+    This simply looks in the YAML response file and returns a random resonse.
+    To use this, simply add a new line in the YAML and it'll be picked up here,
+    though it won't do anything fancier than adding the response.
+    """
     return y(needle)
 
-def msg_status(needle, message):
+def msg_status(_, message):
+    """Check our status and return it to the control room."""
     if not message.is_control:
         return ""
     return "This static text says that all systems are good."
-    
-def msg_network(needle, message):
+
+def msg_network(_, message):
+    """Post the IP address of the chatbot to the control room."""
     if not message.is_control:
         return ""
     return "IP Address: " + str(get_ip_address())
 
-def msg_refresh(needle, message):
+def msg_refresh(_, message):
+    """Refresh command to reload the YAML file."""
     if not message.is_control:
         return ""
     global response_data
     response_data = update_response_yaml()
-    for rd in response_data:
-        if rd not in responses:
-            responses[rd] = msg_default
-    
+    for one_response in response_data:
+        if one_response not in responses:
+            responses[one_response] = msg_default
+
     hipchat.friends = hipchat.get_friends()
     return y("refresh")
-    
+
 def msg_friends(needle, message):
     if not message.is_control:
         return ""
     hipchat.friends = hipchat.get_friends()
-    list = ""
+    friend_list = ""
     for u in hipchat.friends:
-        if (len(list)>0):
-            list += ", "
-        list += u.name
+        if (len(friend_list)>0):
+            friend_list += ", "
+        friend_list += u.name
 
-    list = y("friends") + list
+    friend_list = y("friends") + list
 
     return list
 
@@ -121,7 +135,7 @@ def msg_down(needle, message):
     hipchat.notify_control("Moving desk down...")
     uplift.down
     return y("down")
-    
+
 def msg_rooms(needle,message):
     if not message.is_control:
         return ""
@@ -147,12 +161,12 @@ def evaluate_existing_room(room):
     print "(" + str(hipchat.rate_limit) + ") Evaluating room: " + str(room)
 
     room.lastevaluated = datetime.datetime.utcnow()
-    
+
     if room.lastmsg != None:
         if datetime.date.utcnow() - room.lastmsg < datetime.timedelta(hours=1):
             room.watch_room()
             return  # Recent-ish messages, let's leave this alone
-    
+
     la = room.last_active()
     if la == datetime.date.min:
         hipchat.notify_control("Considering archive of room: " + str(room) + ". Last accessed: Never.")
@@ -160,7 +174,7 @@ def evaluate_existing_room(room):
     elif (datetime.datetime.utcnow() - la) > datetime.timedelta(180):
         hipchat.notify_control("Considering archive of room: " + str(room) + ". Last accessed: " + str(la) + ".")
         return
-        
+
     if (datetime.datetime.utcnow() - la) < datetime.timedelta(hours=1):
         room.watch_room()
     else:
@@ -184,7 +198,7 @@ def evaluate_rooms():
         for r in room_objects:
             if room_objects.active:
                 num = num + 1
-                
+
         interval = int((5*60)/80) * num
         default_interval = 15
         if interval > default_interval:
@@ -194,9 +208,9 @@ def evaluate_rooms():
             r.check_interval = max(default_interval, interval)
 
 
-    
+
 print "My user name is: " + hipchat.api_user
-    
+
 #Blink(10,10)
 
 response_data = update_response_yaml()
@@ -220,7 +234,7 @@ for x in hipchat.rooms:
     room.set_response_list(responses)
     room.lastevaluated = datetime.datetime.utcnow()
     room_objects.append(room)
-    
+
 alive = True
 waitqueue = []
 thread.start_new_thread(input_thread, (waitqueue,))
